@@ -26,10 +26,6 @@ def check_edge_installed():
         traceback.print_exc()
         return False
 
-
-
-
-
 def get_edge_driver_path():
     try:
         # 获取EdgeDriver路径
