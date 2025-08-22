@@ -1,6 +1,11 @@
-# JD Cookie GUI
+# 京东Cookie提取工具
 
-一个用于获取京东Cookie的图形界面工具，基于Python和Selenium开发。
+一个京东Cookie自动提取工具，提供Python和Go两个版本，支持图形界面操作和GitHub自动编译。
+
+## 版本说明
+
+- **Python版本**: 基于tkinter和Selenium的传统版本
+- **Go版本**: 基于Fyne GUI框架的现代化版本，支持跨平台编译
 
 ## 功能特点
 
@@ -19,7 +24,42 @@
 
 ## 使用方法
 
-### 方式一：直接运行可执行文件（推荐）
+### Go版本（推荐）
+
+#### 方式一：下载预编译版本
+1. 从GitHub Releases页面下载对应平台的可执行文件
+2. 确保已安装Microsoft Edge浏览器
+3. 将`msedgedriver.exe`放置在程序同目录下（Windows版本）
+4. 直接运行可执行文件
+5. 点击"获取Cookie"按钮，在弹出的浏览器中登录京东账号
+6. 登录成功后，Cookie会自动显示在程序界面中
+
+#### 方式二：从源码编译
+1. 安装Go 1.21+
+2. 克隆项目：`git clone <repository-url>`
+3. 进入项目目录：`cd jd-cookie-gui`
+4. 安装依赖：`go mod tidy`
+5. 编译运行：`go run main.go`
+6. 或者编译可执行文件：`go build -o jd-cookie-gui main.go`
+
+#### 使用Makefile（可选）
+```bash
+# 安装依赖
+make deps
+
+# 编译当前平台版本
+make build
+
+# 编译所有平台版本
+make build-all
+
+# 运行程序
+make run
+```
+
+### Python版本
+
+#### 方式一：直接运行可执行文件
 
 1. 下载 `dist/jd_cookie_gui.exe`
 2. 双击运行程序
@@ -27,7 +67,7 @@
 4. 在弹出的浏览器中登录京东账号
 5. 登录成功后，Cookie会自动显示并复制到剪贴板
 
-### 方式二：运行Python源码
+#### 方式二：运行Python源码
 
 1. 安装Python 3.7+
 2. 安装依赖包：
@@ -55,21 +95,54 @@ jd_cookie_gui/
 
 ## 技术栈
 
-- **Python 3.x** - 主要开发语言
-- **Tkinter** - GUI界面框架
-- **Selenium** - 浏览器自动化
-- **PyInstaller** - 打包工具
+### Go版本
+- **GUI框架**: Fyne v2.4.3
+- **浏览器自动化**: Selenium WebDriver (github.com/tebeka/selenium)
+- **浏览器**: Microsoft Edge
+- **编译**: Go 1.21+
+- **CI/CD**: GitHub Actions
+
+### Python版本
+- **GUI框架**: tkinter
+- **浏览器自动化**: Selenium WebDriver
+- **浏览器**: Microsoft Edge
+- **打包工具**: PyInstaller
 - **Microsoft Edge WebDriver** - 浏览器驱动
+
+## GitHub Actions自动编译
+
+Go版本支持GitHub Actions自动编译，每次推送代码到main分支或创建tag时会自动构建多平台版本：
+
+### 支持平台
+- **Windows** (amd64)
+- **Linux** (amd64) 
+- **macOS** (amd64)
+
+### 自动化流程
+1. 代码推送触发构建
+2. 多平台并行编译
+3. 自动上传构建产物
+4. 创建tag时自动发布Release
+
+### 获取编译版本
+- 访问项目的GitHub Actions页面查看构建状态
+- 从Artifacts下载对应平台的可执行文件
+- 或从Releases页面下载正式版本
 
 ## 开发特色
 
-### 代码优化
+### Go版本优势
+- 跨平台编译，一次编写多处运行
+- 现代化GUI框架，界面美观
+- 静态编译，无需运行时依赖
+- GitHub Actions自动化构建和发布
+- 更好的性能和资源占用
+
+### Python版本特点
 - 移除了复杂的驱动下载逻辑，简化部署
 - 精简错误处理机制，提高程序稳定性
 - 优化代码结构，从366行精简至228行
 - 清理不必要的依赖和导入
-
-### 用户体验
 - 自动检测浏览器和驱动状态
 - 友好的错误提示信息
 - 一键复制功能，方便使用
