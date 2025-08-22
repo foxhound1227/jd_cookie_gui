@@ -54,21 +54,21 @@ jobs:
         
     - name: Upload Windows artifact
       if: runner.os == 'Windows'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jd-cookie-gui-windows
         path: jd-cookie-gui-windows.exe
         
     - name: Upload Linux artifact
       if: runner.os == 'Linux'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jd-cookie-gui-linux
         path: jd-cookie-gui-linux
         
     - name: Upload macOS artifact
       if: runner.os == 'macOS'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jd-cookie-gui-macos
         path: jd-cookie-gui-macos
@@ -80,15 +80,15 @@ jobs:
     
     steps:
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          jd-cookie-gui-windows/jd-cookie-gui-windows.exe
-          jd-cookie-gui-linux/jd-cookie-gui-linux
-          jd-cookie-gui-macos/jd-cookie-gui-macos
+          artifacts/jd-cookie-gui-windows/jd-cookie-gui-windows.exe
+          artifacts/jd-cookie-gui-linux/jd-cookie-gui-linux
+          artifacts/jd-cookie-gui-macos/jd-cookie-gui-macos
         draft: false
         prerelease: false
         generate_release_notes: true
