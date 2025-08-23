@@ -19,7 +19,6 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/tebeka/selenium"
-	"github.com/tebeka/selenium/chrome"
 )
 
 type JDCookieExtractor struct {
