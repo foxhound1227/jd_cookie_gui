@@ -172,7 +172,6 @@ func (j *JDCookieExtractor) initBrowser() {
 				"--disable-features=msEdgeTranslate",
 			},
 			ExcludeSwitches: []string{"enable-automation"},
-			UseAutomationExtension: false,
 		}
 		caps.AddChrome(chromeCaps)
 
