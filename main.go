@@ -2,10 +2,15 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
+	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -107,6 +112,93 @@ func (j *JDCookieExtractor) checkEdgeInstalled() bool {
 	return false
 }
 
+func (j *JDCookieExtractor) getEdgeVersion() (string, error) {
+	cmd := exec.Command("reg", "query", "HKEY_CURRENT_USER\\Software\\Microsoft\\Edge\\BLBeacon", "/v", "version")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("无法获取Edge版本: %v", err)
+	}
+
+	re := regexp.MustCompile(`version\s+REG_SZ\s+([0-9.]+)`)
+	matches := re.FindStringSubmatch(string(output))
+	if len(matches) < 2 {
+		return "", fmt.Errorf("无法解析Edge版本信息")
+	}
+
+	return matches[1], nil
+}
+
+func (j *JDCookieExtractor) downloadEdgeDriver(version, driverPath string) error {
+	// 更新UI状态
+	j.statusLabel.SetText("正在下载EdgeDriver...")
+	j.progressBar.SetValue(0.4)
+	
+	// 提取主版本号
+	versionParts := strings.Split(version, ".")
+	if len(versionParts) < 3 {
+		return fmt.Errorf("版本格式无效: %s", version)
+	}
+	majorVersion := strings.Join(versionParts[:3], ".")
+
+	// 构建下载URL
+	downloadURL := fmt.Sprintf("https://msedgedriver.azureedge.net/%s/edgedriver_win64.zip", majorVersion)
+	log.Printf("正在下载EdgeDriver: %s", downloadURL)
+
+	// 下载文件
+	resp, err := http.Get(downloadURL)
+	if err != nil {
+		return fmt.Errorf("下载失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("下载失败，状态码: %d", resp.StatusCode)
+	}
+
+	// 创建临时文件
+	tempFile := driverPath + ".zip"
+	out, err := os.Create(tempFile)
+	if err != nil {
+		return fmt.Errorf("创建临时文件失败: %v", err)
+	}
+	defer out.Close()
+	defer os.Remove(tempFile)
+
+	// 保存文件
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return fmt.Errorf("保存文件失败: %v", err)
+	}
+	out.Close()
+
+	// 解压文件（简单实现，假设zip中只有一个exe文件）
+	cmd := exec.Command("powershell", "-Command", fmt.Sprintf("Expand-Archive -Path '%s' -DestinationPath '%s' -Force", tempFile, filepath.Dir(driverPath)))
+	err = cmd.Run()
+	if err != nil {
+		return fmt.Errorf("解压失败: %v", err)
+	}
+
+	// 重命名解压出的文件
+	extractedPath := filepath.Join(filepath.Dir(driverPath), "msedgedriver.exe")
+	if _, err := os.Stat(extractedPath); err == nil {
+		return nil // 文件已存在
+	}
+
+	// 查找解压出的driver文件
+	files, err := filepath.Glob(filepath.Join(filepath.Dir(driverPath), "*driver*.exe"))
+	if err != nil || len(files) == 0 {
+		return fmt.Errorf("未找到解压的driver文件")
+	}
+
+	// 重命名为msedgedriver.exe
+	err = os.Rename(files[0], driverPath)
+	if err != nil {
+		return fmt.Errorf("重命名driver文件失败: %v", err)
+	}
+
+	return nil
+}
+
 func (j *JDCookieExtractor) getEdgeDriverPath() (string, error) {
 	execPath, err := os.Executable()
 	if err != nil {
@@ -116,8 +208,25 @@ func (j *JDCookieExtractor) getEdgeDriverPath() (string, error) {
 	baseDir := filepath.Dir(execPath)
 	driverPath := filepath.Join(baseDir, "msedgedriver.exe")
 
+	// 检查EdgeDriver是否存在
 	if _, err := os.Stat(driverPath); os.IsNotExist(err) {
-		return "", fmt.Errorf("EdgeDriver文件不存在: %s\n请手动下载EdgeDriver并放置在程序目录中", driverPath)
+		log.Println("EdgeDriver不存在，尝试自动下载...")
+		
+		// 获取Edge版本
+		version, err := j.getEdgeVersion()
+		if err != nil {
+			return "", fmt.Errorf("EdgeDriver文件不存在且无法获取Edge版本\n\n文件路径: %s\n\n解决方案:\n1. 请访问 https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/\n2. 下载与您的Edge浏览器版本匹配的EdgeDriver\n3. 将下载的msedgedriver.exe文件放置在程序目录中\n4. 重新启动程序\n\n错误详情: %v", driverPath, err)
+		}
+
+		log.Printf("检测到Edge版本: %s", version)
+		
+		// 尝试下载EdgeDriver
+		err = j.downloadEdgeDriver(version, driverPath)
+		if err != nil {
+			return "", fmt.Errorf("EdgeDriver自动下载失败\n\n文件路径: %s\nEdge版本: %s\n\n请手动下载:\n1. 访问 https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/\n2. 下载版本 %s 的EdgeDriver\n3. 将msedgedriver.exe放置在程序目录中\n\n错误详情: %v", driverPath, version, version, err)
+		}
+		
+		log.Println("EdgeDriver下载成功")
 	}
 
 	log.Printf("使用EdgeDriver: %s", driverPath)
@@ -139,15 +248,18 @@ func (j *JDCookieExtractor) initBrowser() {
 			return
 		}
 
-		j.statusLabel.SetText("初始化浏览器...")
-		j.progressBar.SetValue(0.5)
+		j.statusLabel.SetText("检查EdgeDriver...")
+		j.progressBar.SetValue(0.3)
 
-		// 获取EdgeDriver路径
+		// 获取EdgeDriver路径（可能会自动下载）
 		driverPath, err := j.getEdgeDriverPath()
 		if err != nil {
 			dialog.ShowError(err, j.myWindow)
 			return
 		}
+
+		j.statusLabel.SetText("初始化浏览器...")
+		j.progressBar.SetValue(0.6)
 
 		// 启动Selenium服务
 		selenium.SetDebug(false)
