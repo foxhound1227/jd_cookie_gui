@@ -23,7 +23,9 @@ jobs:
 
         
     - name: Download dependencies
-      run: go mod download
+      run: |
+        go mod tidy
+        go mod download
       
     - name: Build for Windows
       run: |
