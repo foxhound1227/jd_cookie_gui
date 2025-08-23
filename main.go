@@ -135,13 +135,13 @@ func (j *JDCookieExtractor) downloadEdgeDriver(version, driverPath string) error
 	
 	// 提取主版本号
 	versionParts := strings.Split(version, ".")
-	if len(versionParts) < 3 {
+	if len(versionParts) < 4 {
 		return fmt.Errorf("版本格式无效: %s", version)
 	}
-	majorVersion := strings.Join(versionParts[:3], ".")
+	majorVersion := strings.Join(versionParts[:4], ".")
 
-	// 构建下载URL
-	downloadURL := fmt.Sprintf("https://msedgedriver.azureedge.net/%s/edgedriver_win64.zip", majorVersion)
+	// 构建下载URL - 使用Microsoft官方地址
+	downloadURL := fmt.Sprintf("https://msedgedriver.microsoft.com/%s/edgedriver_win64.zip", majorVersion)
 	log.Printf("正在下载EdgeDriver: %s", downloadURL)
 
 	// 下载文件
@@ -270,10 +270,13 @@ func (j *JDCookieExtractor) initBrowser() {
 		}
 		defer service.Stop()
 
-		// 配置浏览器选项
-		caps := selenium.Capabilities{"browserName": "chrome"}
-		chromeCaps := chrome.Capabilities{
-			Args: []string{
+		// 等待服务启动
+		time.Sleep(2 * time.Second)
+
+		// 配置浏览器选项 - 使用MicrosoftEdge
+		caps := selenium.Capabilities{"browserName": "MicrosoftEdge"}
+		edgeOptions := map[string]interface{}{
+			"args": []string{
 				"--disable-infobars",
 				"--disable-extensions",
 				"--disable-gpu",
@@ -282,10 +285,12 @@ func (j *JDCookieExtractor) initBrowser() {
 				"--start-maximized",
 				"--disable-blink-features=AutomationControlled",
 				"--disable-features=msEdgeTranslate",
+				"--disable-web-security",
 			},
-			ExcludeSwitches: []string{"enable-automation"},
+			"excludeSwitches": []string{"enable-automation"},
+			"useAutomationExtension": false,
 		}
-		caps.AddChrome(chromeCaps)
+		caps["ms:edgeOptions"] = edgeOptions
 
 		// 创建WebDriver
 		j.driver, err = selenium.NewRemote(caps, "http://localhost:9515")
