@@ -31,7 +31,7 @@ jobs:
           $edgeVersion = "120.0.2210.144"
         }
         Write-Host "Edge version: $edgeVersion"
-        $downloadUrl = "https://msedgedriver.microsoft.com/$edgeVersion/edgedriver_win64.zip"
+        $downloadUrl = "https://msedgedriver.microsoft.com/$edgeVersion/edgedriver_win32.zip"
         Write-Host "Downloading EdgeDriver from: $downloadUrl"
         try {
           Invoke-WebRequest -Uri $downloadUrl -OutFile "edgedriver.zip"
@@ -41,14 +41,14 @@ jobs:
           } else {
             Write-Host "EdgeDriver not found after extraction, trying alternative version"
             $altVersion = "120.0.2210.144"
-            $altUrl = "https://msedgedriver.microsoft.com/$altVersion/edgedriver_win64.zip"
+            $altUrl = "https://msedgedriver.microsoft.com/$altVersion/edgedriver_win32.zip"
             Invoke-WebRequest -Uri $altUrl -OutFile "edgedriver_alt.zip"
             Expand-Archive -Path "edgedriver_alt.zip" -DestinationPath "."
           }
         } catch {
           Write-Host "Failed to download EdgeDriver: $_"
           Write-Host "Using fallback version"
-          $fallbackUrl = "https://msedgedriver.microsoft.com/120.0.2210.144/edgedriver_win64.zip"
+          $fallbackUrl = "https://msedgedriver.microsoft.com/120.0.2210.144/edgedriver_win32.zip"
           Invoke-WebRequest -Uri $fallbackUrl -OutFile "edgedriver_fallback.zip"
           Expand-Archive -Path "edgedriver_fallback.zip" -DestinationPath "."
         }

@@ -51,8 +51,8 @@ def download_edge_driver(version, status_callback=None):
         if status_callback:
             status_callback("正在下载EdgeDriver...")
         
-        # 构建下载URL
-        download_url = f"https://msedgedriver.microsoft.com/{version}/edgedriver_win64.zip"
+        # 构建下载URL (使用32位版本以提高兼容性)
+        download_url = f"https://msedgedriver.microsoft.com/{version}/edgedriver_win32.zip"
         print(f"下载EdgeDriver: {download_url}")
         
         # 下载文件
