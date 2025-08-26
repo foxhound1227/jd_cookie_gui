@@ -7,77 +7,13 @@ from selenium.common.exceptions import InvalidSessionIdException
 import os
 import sys
 import traceback
-import requests
-import zipfile
-import subprocess
-import re
+# 移除不再需要的导入
+# import requests
+# import zipfile
+# import subprocess
+# import re
 
-def get_edge_version():
-    try:
-        # 尝试从注册表获取Edge版本
-        import winreg
-        try:
-            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Edge\BLBeacon")
-            version, _ = winreg.QueryValueEx(key, "version")
-            winreg.CloseKey(key)
-            return version
-        except:
-            pass
-        
-        # 尝试从程序文件获取版本
-        edge_paths = [
-            os.path.join(os.environ.get('PROGRAMFILES(X86)', ''), 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
-            os.path.join(os.environ.get('PROGRAMFILES', ''), 'Microsoft', 'Edge', 'Application', 'msedge.exe')
-        ]
-        
-        for edge_path in edge_paths:
-            if os.path.exists(edge_path):
-                try:
-                    result = subprocess.run([edge_path, '--version'], capture_output=True, text=True, timeout=10)
-                    if result.returncode == 0:
-                        version_match = re.search(r'(\d+\.\d+\.\d+\.\d+)', result.stdout)
-                        if version_match:
-                            return version_match.group(1)
-                except:
-                    continue
-        
-        return None
-    except Exception as e:
-        print(f"获取Edge版本时出现异常: {str(e)}")
-        return None
 
-def download_edge_driver(version, status_callback=None):
-    try:
-        if status_callback:
-            status_callback("正在下载EdgeDriver...")
-        
-        # 构建下载URL (使用32位版本以提高兼容性)
-        download_url = f"https://msedgedriver.microsoft.com/{version}/edgedriver_win32.zip"
-        print(f"下载EdgeDriver: {download_url}")
-        
-        # 下载文件
-        response = requests.get(download_url, timeout=30)
-        response.raise_for_status()
-        
-        # 保存到临时文件
-        zip_path = "edgedriver.zip"
-        with open(zip_path, 'wb') as f:
-            f.write(response.content)
-        
-        # 解压文件
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(".")
-        
-        # 删除临时文件
-        os.remove(zip_path)
-        
-        if status_callback:
-            status_callback("EdgeDriver下载完成")
-        
-        return True
-    except Exception as e:
-        print(f"下载EdgeDriver失败: {str(e)}")
-        return False
 
 def check_edge_installed():
     try:
@@ -113,27 +49,9 @@ def get_edge_driver_path(status_callback=None):
             base_path = os.path.dirname(os.path.abspath(__file__))
             driver_path = os.path.join(base_path, 'msedgedriver.exe')
         
-        # 如果EdgeDriver不存在，尝试自动下载
+        # 检查EdgeDriver是否存在
         if not os.path.exists(driver_path):
-            print("EdgeDriver不存在，尝试自动下载...")
-            if status_callback:
-                status_callback("检测Edge版本...")
-            
-            # 获取Edge版本
-            edge_version = get_edge_version()
-            if not edge_version:
-                raise Exception("无法获取Edge浏览器版本，请确保已安装Microsoft Edge")
-            
-            print(f"检测到Edge版本: {edge_version}")
-            
-            # 下载EdgeDriver
-            if download_edge_driver(edge_version, status_callback):
-                print("EdgeDriver下载成功")
-            else:
-                raise Exception("EdgeDriver下载失败，请手动下载EdgeDriver并放置在程序目录中")
-        
-        if not os.path.exists(driver_path):
-            raise Exception(f"EdgeDriver文件不存在: {driver_path}\n请手动下载EdgeDriver并放置在程序目录中")
+            raise Exception(f"EdgeDriver文件不存在: {driver_path}\n请确保msedgedriver.exe文件在程序目录中")
         
         print(f"使用EdgeDriver: {driver_path}")
         return driver_path

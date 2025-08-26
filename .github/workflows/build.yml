@@ -22,37 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install selenium pyinstaller==5.13.2 requests
-    
-    - name: Download EdgeDriver
-      run: |
-        $edgeVersion = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe").version
-        if (-not $edgeVersion) {
-          $edgeVersion = "120.0.2210.144"
-        }
-        Write-Host "Edge version: $edgeVersion"
-        $downloadUrl = "https://msedgedriver.microsoft.com/$edgeVersion/edgedriver_win32.zip"
-        Write-Host "Downloading EdgeDriver from: $downloadUrl"
-        try {
-          Invoke-WebRequest -Uri $downloadUrl -OutFile "edgedriver.zip"
-          Expand-Archive -Path "edgedriver.zip" -DestinationPath "."
-          if (Test-Path "msedgedriver.exe") {
-            Write-Host "EdgeDriver downloaded successfully"
-          } else {
-            Write-Host "EdgeDriver not found after extraction, trying alternative version"
-            $altVersion = "120.0.2210.144"
-            $altUrl = "https://msedgedriver.microsoft.com/$altVersion/edgedriver_win32.zip"
-            Invoke-WebRequest -Uri $altUrl -OutFile "edgedriver_alt.zip"
-            Expand-Archive -Path "edgedriver_alt.zip" -DestinationPath "."
-          }
-        } catch {
-          Write-Host "Failed to download EdgeDriver: $_"
-          Write-Host "Using fallback version"
-          $fallbackUrl = "https://msedgedriver.microsoft.com/120.0.2210.144/edgedriver_win32.zip"
-          Invoke-WebRequest -Uri $fallbackUrl -OutFile "edgedriver_fallback.zip"
-          Expand-Archive -Path "edgedriver_fallback.zip" -DestinationPath "."
-        }
-      shell: powershell
+        pip install selenium pyinstaller==5.13.2
     
     - name: Build executable
       run: |
@@ -78,7 +48,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install selenium pyinstaller==5.13.2 requests
+        pip install selenium pyinstaller==5.13.2
         sudo apt-get update
         sudo apt-get install -y xvfb
     
