@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install selenium pyinstaller tkinter
+        pip install selenium pyinstaller==5.13.2
     
     - name: Download EdgeDriver
       run: |
@@ -78,7 +78,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install selenium pyinstaller
+        pip install selenium pyinstaller==5.13.2
         sudo apt-get update
         sudo apt-get install -y xvfb
     
