@@ -59,7 +59,7 @@ jobs:
         pyinstaller --onefile --windowed --add-data "msedgedriver.exe;." --name "jd-cookie-gui-windows" jd_cookie_gui.py
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jd-cookie-gui-windows
         path: dist/jd-cookie-gui-windows.exe
@@ -96,7 +96,7 @@ jobs:
         pyinstaller --onefile --add-data "chromedriver:." --name "jd-cookie-gui-linux" jd_cookie_gui.py
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: jd-cookie-gui-linux
         path: dist/jd-cookie-gui-linux
