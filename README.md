@@ -1,187 +1,119 @@
 # 京东Cookie提取工具
 
-一个京东Cookie自动提取工具，提供Python和Go两个版本，支持图形界面操作和GitHub自动编译。
-
-## 版本说明
-
-- **Python版本**: 基于tkinter和Selenium的传统版本
-- **Go版本**: 基于Fyne GUI框架的现代化版本，支持跨平台编译
+一个简单易用的京东Cookie提取工具，支持自动化浏览器操作获取登录Cookie。
 
 ## 功能特点
 
-- 🖥️ 简洁直观的图形用户界面
-- 🔄 自动检测Microsoft Edge浏览器
-- 🍪 一键获取京东登录Cookie
-- 📋 自动复制Cookie到剪贴板
-- 🚀 支持打包为独立可执行文件
-- ⚡ 精简优化的代码结构
+- 🚀 **自动化操作**: 使用Selenium WebDriver自动打开京东登录页面
+- 🔒 **安全可靠**: 本地运行，不上传任何个人信息
+- 💻 **跨平台支持**: 支持Windows和Linux系统
+- 🎯 **简单易用**: 图形化界面，一键操作
+- 📦 **免安装**: 提供编译好的可执行文件
 
-## 系统要求
+## 快速开始
 
-- Windows 10/11 64位系统
-- Microsoft Edge浏览器
-- EdgeDriver（已包含在项目中）
+### 方法一：下载可执行文件（推荐）
 
-## 使用方法
+1. 前往 [Releases](../../releases) 页面
+2. 下载适合您系统的可执行文件：
+   - Windows: `jd-cookie-gui-windows.exe`
+   - Linux: `jd-cookie-gui-linux`
+3. 双击运行即可使用
 
-### Go版本（推荐）
+### 方法二：从源码运行
 
-#### 方式一：下载预编译版本
-1. 从GitHub Releases页面下载对应平台的可执行文件
-2. 确保已安装Microsoft Edge浏览器
-3. 将`msedgedriver.exe`放置在程序同目录下（Windows版本）
-4. 直接运行可执行文件
-5. 点击"获取Cookie"按钮，在弹出的浏览器中登录京东账号
-6. 登录成功后，Cookie会自动显示在程序界面中
+#### 环境要求
 
-#### 方式二：从源码编译
-1. 安装Go 1.21+
-2. 克隆项目：`git clone <repository-url>`
-3. 进入项目目录：`cd jd-cookie-gui`
-4. 安装依赖：`go mod tidy`
-5. 编译运行：`go run main.go`
-6. 或者编译可执行文件：`go build -o jd-cookie-gui main.go`
+- Python 3.8+
+- Microsoft Edge浏览器（Windows）或Google Chrome浏览器（Linux）
 
-#### 使用Makefile（可选）
+#### 安装依赖
+
 ```bash
-# 安装依赖
-make deps
-
-# 编译当前平台版本
-make build
-
-# 编译所有平台版本
-make build-all
-
-# 运行程序
-make run
+pip install selenium tkinter
 ```
 
-### Python版本
+#### 下载WebDriver
 
-#### 方式一：直接运行可执行文件
+**Windows (EdgeDriver):**
+1. 查看Edge浏览器版本：在地址栏输入 `edge://version/`
+2. 前往 [Microsoft Edge WebDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/) 下载对应版本
+3. 将 `msedgedriver.exe` 放在项目根目录
 
-1. 下载 `dist/jd_cookie_gui.exe`
-2. 双击运行程序
-3. 点击"获取Cookie"按钮
-4. 在弹出的浏览器中登录京东账号
-5. 登录成功后，Cookie会自动显示并复制到剪贴板
+**Linux (ChromeDriver):**
+1. 查看Chrome版本：`google-chrome --version`
+2. 前往 [ChromeDriver](https://chromedriver.chromium.org/) 下载对应版本
+3. 将 `chromedriver` 放在项目根目录并添加执行权限
 
-#### 方式二：运行Python源码
+#### 运行程序
 
-1. 安装Python 3.7+
-2. 安装依赖包：
-   ```bash
-   pip install selenium tkinter
-   ```
-3. 运行程序：
-   ```bash
-   python jd_cookie_gui.py
-   ```
-
-## 项目结构
-
+```bash
+python jd_cookie_gui.py
 ```
-jd_cookie_gui/
-├── jd_cookie_gui.py      # 主程序源码
-├── jd_cookie_gui.spec    # PyInstaller打包配置
-├── msedgedriver.exe      # Edge WebDriver
-├── dist/                 # 打包后的可执行文件
-│   └── jd_cookie_gui.exe
-├── build/                # 构建临时文件
-├── 使用说明.txt          # 详细使用说明
-└── README.md             # 项目说明文档
-```
+
+## 使用说明
+
+1. **启动程序**: 运行可执行文件或Python脚本
+2. **初始化浏览器**: 程序会自动检测并启动浏览器
+3. **登录京东**: 在打开的浏览器窗口中完成京东登录
+4. **获取Cookie**: 登录成功后，点击"获取Cookie"按钮
+5. **复制使用**: Cookie信息会显示在文本框中，可直接复制使用
+
+## 自动编译
+
+本项目配置了GitHub Actions自动编译，每次推送代码到main分支时会自动构建Windows和Linux版本的可执行文件。
+
+### 编译流程
+
+- **Windows版本**: 使用EdgeDriver，打包为单文件可执行程序
+- **Linux版本**: 使用ChromeDriver，打包为单文件可执行程序
+- **自动发布**: 编译完成的文件会作为Artifacts上传，可在Actions页面下载
 
 ## 技术栈
 
-### Go版本
-- **GUI框架**: Fyne v2.4.3
-- **浏览器自动化**: Selenium WebDriver (github.com/tebeka/selenium)
-- **浏览器**: Microsoft Edge
-- **编译**: Go 1.21+
-- **CI/CD**: GitHub Actions
-
-### Python版本
-- **GUI框架**: tkinter
+- **GUI框架**: Tkinter
 - **浏览器自动化**: Selenium WebDriver
-- **浏览器**: Microsoft Edge
 - **打包工具**: PyInstaller
-- **Microsoft Edge WebDriver** - 浏览器驱动
-
-## GitHub Actions自动编译
-
-Go版本支持GitHub Actions自动编译，每次推送代码到main分支或创建tag时会自动构建多平台版本：
-
-### 支持平台
-- **Windows** (amd64)
-- **Linux** (amd64) 
-- **macOS** (amd64)
-
-### 自动化流程
-1. 代码推送触发构建
-2. 多平台并行编译
-3. 自动上传构建产物
-4. 创建tag时自动发布Release
-
-### 获取编译版本
-- 访问项目的GitHub Actions页面查看构建状态
-- 从Artifacts下载对应平台的可执行文件
-- 或从Releases页面下载正式版本
-
-## 开发特色
-
-### Go版本优势
-- 跨平台编译，一次编写多处运行
-- 现代化GUI框架，界面美观
-- 静态编译，无需运行时依赖
-- GitHub Actions自动化构建和发布
-- 更好的性能和资源占用
-
-### Python版本特点
-- 移除了复杂的驱动下载逻辑，简化部署
-- 精简错误处理机制，提高程序稳定性
-- 优化代码结构，从366行精简至228行
-- 清理不必要的依赖和导入
-- 自动检测浏览器和驱动状态
-- 友好的错误提示信息
-- 一键复制功能，方便使用
-- 独立可执行文件，无需安装Python环境
+- **CI/CD**: GitHub Actions
 
 ## 注意事项
 
-1. 首次使用需要手动登录京东账号
-2. 确保Microsoft Edge浏览器已安装
-3. 如果遇到驱动问题，请检查Edge版本兼容性
-4. Cookie有时效性，建议定期重新获取
+⚠️ **重要提醒**:
+- 本工具仅用于个人学习和研究目的
+- 请遵守京东网站的使用条款和相关法律法规
+- 不要将获取的Cookie用于任何违法违规活动
+- 建议定期更新Cookie以确保有效性
 
-## 故障排除
+## 常见问题
 
-### 常见问题
+### Q: 程序启动后浏览器无法打开？
+A: 请确保已安装对应的浏览器和WebDriver，并且版本匹配。
 
-**Q: 提示"未找到msedgedriver.exe"**
-A: 确保msedgedriver.exe文件与程序在同一目录下
+### Q: 获取Cookie失败？
+A: 请确保已完全登录京东，并且页面加载完成后再点击获取Cookie。
 
-**Q: 浏览器无法启动**
-A: 检查Microsoft Edge是否正确安装，版本是否兼容
+### Q: Windows版本提示找不到EdgeDriver？
+A: 请下载与您Edge浏览器版本匹配的EdgeDriver，并放在程序同目录下。
 
-**Q: Cookie获取失败**
-A: 确保已成功登录京东账号，刷新页面后重试
+### Q: Linux版本无法运行？
+A: 请确保已安装Chrome浏览器和对应版本的ChromeDriver，并给予执行权限。
 
-## 版本信息
+## 更新日志
 
-- **当前版本**: v1.0
-- **最后更新**: 2025年1月
-- **兼容性**: Windows 10/11, Microsoft Edge
+### v1.0.0
+- 初始版本发布
+- 支持Windows和Linux平台
+- 图形化界面
+- 自动化Cookie提取功能
 
 ## 许可证
 
-本项目仅供学习和个人使用，请遵守相关法律法规和网站服务条款。
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
 ## 贡献
 
-欢迎提交Issue和Pull Request来改进这个项目。
+欢迎提交Issue和Pull Request来改进这个项目！
 
 ---
 
-**免责声明**: 本工具仅用于技术学习和个人使用，使用者需自行承担使用风险，开发者不承担任何法律责任。
+**免责声明**: 本工具仅供学习交流使用，使用者需自行承担使用风险。开发者不对因使用本工具而产生的任何问题负责。
