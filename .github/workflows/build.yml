@@ -35,46 +35,9 @@ jobs:
       with:
         name: jd-cookie-gui-windows
         path: dist/jd-cookie-gui-windows.exe
-        
-  build-linux:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install selenium pyinstaller==5.13.2
-        sudo apt-get update
-        sudo apt-get install -y xvfb
-    
-    - name: Download ChromeDriver for Linux
-      run: |
-        CHROME_VERSION=$(google-chrome --version | cut -d ' ' -f3 | cut -d '.' -f1-3)
-        echo "Chrome version: $CHROME_VERSION"
-        wget -O chromedriver.zip "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION/chromedriver_linux64.zip" || \
-        wget -O chromedriver.zip "https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip"
-        unzip chromedriver.zip
-        chmod +x chromedriver
-    
-    - name: Build executable
-      run: |
-        pyinstaller --onefile --add-data "chromedriver:." --name "jd-cookie-gui-linux" jd_cookie_gui.py
-    
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: jd-cookie-gui-linux
-        path: dist/jd-cookie-gui-linux
 
   release:
-    needs: [build-windows, build-linux]
+    needs: [build-windows]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
@@ -87,19 +50,37 @@ jobs:
         name: jd-cookie-gui-windows
         path: ./windows
         
-    - name: Download Linux artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: jd-cookie-gui-linux
-        path: ./linux
-        
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
           ./windows/jd-cookie-gui-windows.exe
-          ./linux/jd-cookie-gui-linux
-        generate_release_notes: true
+        body: |
+          ## 京东Cookie获取工具 Windows版本
+          
+          ### 功能特性
+          - 🔐 自动获取京东登录Cookie
+          - 🖥️ 图形化用户界面，操作简单
+          - 🚀 基于Selenium WebDriver自动化
+          - 📋 一键复制Cookie到剪贴板
+          - 💾 支持Cookie保存和导出
+          
+          ### 使用说明
+          1. 下载 `jd-cookie-gui-windows.exe` 文件
+          2. 双击运行程序
+          3. 点击"开始获取Cookie"按钮
+          4. 在弹出的浏览器中完成京东登录
+          5. 程序会自动获取并显示Cookie信息
+          
+          ### 系统要求
+          - Windows 10/11 (64位)
+          - Microsoft Edge浏览器
+          
+          ### 注意事项
+          - 首次运行可能需要管理员权限
+          - 请确保网络连接正常
+          - 建议关闭杀毒软件的实时保护以避免误报
+        generate_release_notes: false
         draft: false
         prerelease: false
       env:
