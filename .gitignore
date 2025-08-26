@@ -161,7 +161,6 @@ cython_debug/
 #  *.ipr
 
 # WebDriver executables
-msedgedriver.exe
 chromedriver
 chromedriver.exe
 
