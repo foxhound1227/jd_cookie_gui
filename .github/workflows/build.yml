@@ -3,6 +3,8 @@ name: Build JD Cookie GUI
 on:
   push:
     branches: [ main ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -70,3 +72,33 @@ jobs:
       with:
         name: jd-cookie-gui-linux
         path: dist/jd-cookie-gui-linux
+
+  release:
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Download Windows artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: jd-cookie-gui-windows
+        path: ./windows
+        
+    - name: Download Linux artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: jd-cookie-gui-linux
+        path: ./linux
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ./windows/jd-cookie-gui-windows.exe
+          ./linux/jd-cookie-gui-linux
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
