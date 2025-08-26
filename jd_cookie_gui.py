@@ -176,7 +176,7 @@ class JDCookieExtractor:
                         })
                     '''
                 })
-                self.driver.get("https://plogin.m.jd.com/login/login")
+                self.driver.get("https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fm.jd.com%2F&source=wq_passport")
             except Exception as e:
                 print(f"加载京东页面失败: {str(e)}")
                 # 即使加载失败也继续运行，让用户可以手动刷新页面
