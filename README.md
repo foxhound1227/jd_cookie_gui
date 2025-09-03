@@ -1,6 +1,6 @@
-# 京东Cookie获取工具
+# 京东Cookie获取工具 (Go版本)
 
-一个简单易用的京东Cookie获取工具，基于图形化界面，支持自动化浏览器操作获取登录Cookie。
+一个简单易用的京东Cookie获取工具，基于命令行界面，使用Go语言实现，支持自动化浏览器操作获取登录Cookie。
 
 ## 功能特点
 
@@ -24,37 +24,36 @@
 
 #### 环境要求
 
-- Python 3.8+
-- Microsoft Edge浏览器
+- Go 1.21+
+- Chrome浏览器
 - Windows 10/11 (64位)
 
 #### 安装依赖
 
 ```bash
-pip install selenium tkinter
+go mod tidy
 ```
-
-#### 下载WebDriver
-
-**EdgeDriver配置:**
-1. 查看Edge浏览器版本：在地址栏输入 `edge://version/`
-2. 前往 [Microsoft Edge WebDriver](https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/) 下载对应版本
-3. 将 `msedgedriver.exe` 放在项目根目录
 
 #### 运行程序
 
 ```bash
-python jd_cookie_gui.py
+go run main.go
+```
+
+#### 构建可执行文件
+
+```bash
+go build -o jd-cookie-gui-windows.exe main.go
 ```
 
 ## 使用说明
 
-1. **启动程序**: 双击运行 `jd-cookie-gui-windows.exe` 或运行Python脚本
-2. **点击开始**: 点击"开始获取Cookie"按钮
-3. **自动打开浏览器**: 程序会自动启动Microsoft Edge浏览器并打开京东登录页面
-4. **完成登录**: 在浏览器中输入京东账号密码完成登录
-5. **自动获取**: 登录成功后程序会自动获取Cookie信息
-6. **复制使用**: Cookie信息显示在文本框中，可一键复制到剪贴板
+1. **启动程序**: 双击运行 `jd-cookie-gui-windows.exe` 或运行Go程序
+2. **自动打开浏览器**: 程序会自动启动Chrome浏览器并打开京东登录页面
+3. **完成登录**: 在浏览器中输入京东账号密码完成登录
+4. **确认登录**: 登录成功后回到程序界面，按回车键继续
+5. **自动获取**: 程序会自动获取Cookie信息并显示在控制台
+6. **复制使用**: Cookie信息会显示在控制台中，可手动复制使用
 
 ## 自动编译
 
@@ -68,9 +67,9 @@ python jd_cookie_gui.py
 
 ## 技术栈
 
-- **GUI框架**: Tkinter
-- **浏览器自动化**: Selenium WebDriver
-- **打包工具**: PyInstaller
+- **编程语言**: Go
+- **浏览器自动化**: Rod (基于Chrome DevTools Protocol)
+- **打包工具**: Go Modules
 - **CI/CD**: GitHub Actions
 
 ## 注意事项

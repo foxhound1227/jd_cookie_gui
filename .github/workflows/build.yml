@@ -16,25 +16,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Set up Go
+      uses: actions/setup-go@v4
       with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install selenium pyinstaller==5.13.2
+        go-version: '1.21'
     
     - name: Build executable
       run: |
-        pyinstaller --onefile --windowed --add-data "msedgedriver.exe;." --name "jd-cookie-gui-windows" jd_cookie_gui.py
+        go build -o jd-cookie-gui-windows.exe main.go
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: jd-cookie-gui-windows
-        path: dist/jd-cookie-gui-windows.exe
+        path: jd-cookie-gui-windows.exe
 
   release:
     needs: [build-windows]
@@ -56,25 +51,25 @@ jobs:
         files: |
           ./windows/jd-cookie-gui-windows.exe
         body: |
-          ## 京东Cookie获取工具 Windows版本
+          ## 京东Cookie获取工具 Windows版本 (Go版本)
           
           ### 功能特性
           - 🔐 自动获取京东登录Cookie
-          - 🖥️ 图形化用户界面，操作简单
-          - 🚀 基于Selenium WebDriver自动化
-          - 📋 一键复制Cookie到剪贴板
-          - 💾 支持Cookie保存和导出
+          - 🖥️ 命令行界面，操作简单
+          - 🚀 基于Rod框架的浏览器自动化
+          - 📋 控制台显示Cookie信息，可手动复制
           
           ### 使用说明
           1. 下载 `jd-cookie-gui-windows.exe` 文件
           2. 双击运行程序
-          3. 点击"开始获取Cookie"按钮
-          4. 在弹出的浏览器中完成京东登录
-          5. 程序会自动获取并显示Cookie信息
+          3. 程序会自动打开Chrome浏览器并跳转到京东登录页面
+          4. 在浏览器中完成京东登录
+          5. 登录成功后回到程序界面，按回车键继续
+          6. 程序会自动获取并显示Cookie信息
           
           ### 系统要求
           - Windows 10/11 (64位)
-          - Microsoft Edge浏览器
+          - Chrome浏览器
           
           ### 注意事项
           - 首次运行可能需要管理员权限
