@@ -21,6 +21,12 @@ jobs:
       with:
         go-version: '1.21'
     
+    - name: Get dependencies
+      run: |
+        go get github.com/go-rod/rod
+        go get github.com/go-rod/rod/lib/launcher
+        go mod tidy
+        
     - name: Build executable
       run: |
         go build -o jd-cookie-gui-windows.exe main.go
