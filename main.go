@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
-	"strings"
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
@@ -33,10 +31,6 @@ func main() {
 	
 	browser := rod.New().ControlURL(u).MustConnect()
 	defer browser.MustClose()
-	
-	// 设置浏览器窗口位置和大小
-	// 这里简化处理，实际可能需要更复杂的屏幕尺寸获取
-	browser.MustWindow("", 0, 0, 800, 600)
 	
 	// 打开京东登录页面
 	fmt.Println("正在打开京东登录页面...")
